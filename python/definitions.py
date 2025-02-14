@@ -135,7 +135,9 @@ planner_names = {
     'fpest': 'FP EST',
     'fpsst': 'FP SST',
     'fprrt': 'FP RRT',
-    'fppdst': 'FP PDST'
+    'fppdst': 'FP PDST',
+    'shfm2ws' : 'State HFM 2WS',
+    'shfm4ws' : 'State HFM 4WS'
 }
 
 # Names internally used by MPB/OMPL to appear in the "plans" dictionary of the results files

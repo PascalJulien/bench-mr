@@ -1,6 +1,6 @@
 #pragma once
 
-#include <base/PathStatistics.hpp>
+//#include <base/PathStatistics.hpp>
 #include "TrajectoryMetric.h"
 
 class ClearingMetric : public TMetric<ClearingMetric> {
@@ -31,6 +31,9 @@ class ClearingMetric : public TMetric<ClearingMetric> {
 
   static double evaluateMetric(const ompl::geometric::PathGeometric &trajectory,
                                double, bool visualize = false) {
-    return stat::mean(clearingDistances(trajectory));
+    double avg = 0;
+    for (double v : clearingDistances(trajectory)) avg += v;
+    return avg / clearingDistances(trajectory).size();
+    //return stat::mean(clearingDistances(trajectory));
   }
 };

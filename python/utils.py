@@ -2,6 +2,7 @@
 import click
 import json
 import os
+from metrics_bindings import compute_path_length, compute_curvature, compute_smoothness, compute_aol, compute_clearing_distances
 from definitions import steer_functions, steer_function_names, smoother_names, smoothers, planner_names, robot_models, robot_models_names
 import numpy as np
 
@@ -307,3 +308,38 @@ def get_aggregate_stats(results_filenames: [str]) -> dict:
         "collision_free": collision_free,
         "exact": exact
     }
+
+def evaluate_path_metrics(path,env):
+    """
+    Évalue les métriques pour un chemin donné
+    
+    Args:
+        path: Liste de points [x, y, theta]
+        
+    Returns:
+        dict: Dictionnaire contenant les métriques calculées
+    """
+    metrics = {}
+    
+    # Calcul de la longueur du chemin
+    metrics['path_length'] = compute_path_length(path)
+    
+    # Calcul des courbures
+    max_curv, norm_curv = compute_curvature(path)
+    metrics['max_curvature'] = max_curv
+    metrics['normalized_curvature'] = norm_curv
+    
+    # Calcul de la régularité
+    metrics['smoothness'] = compute_smoothness(path)
+    
+    # Calcul de l'AOL
+    metrics['aol'] = compute_aol(path)
+    
+    # Calcul des clearing distances
+    clearing_distances = compute_clearing_distances(path,env)
+    metrics['mean_clearing_distance'] = np.mean(clearing_distances)
+    metrics['median_clearing_distance'] = np.median(clearing_distances)
+    metrics['min_clearing_distance'] = np.min(clearing_distances)
+    metrics['max_clearing_distance'] = np.max(clearing_distances)
+    
+    return metrics

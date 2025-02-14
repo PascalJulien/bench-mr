@@ -17,7 +17,7 @@ from multiprocessing import Pool
 from tqdm.notebook import tqdm
 
 MPB_BINARY = './benchmark'
-MPB_BINARY_DIR = '../bin'
+MPB_BINARY_DIR = './bench-mr/bin'
 
 # limit memory by this fraction of available memory if activated for parallel MPB execution
 MEMORY_LIMIT_FRACTION = min(0.9, 5. / os.cpu_count())

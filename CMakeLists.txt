@@ -1,3 +1,5 @@
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 cmake_minimum_required(VERSION 3.0)
 
 project(mpb)
@@ -140,3 +142,6 @@ target_link_libraries(generate_obstacle_ratio_benchmarks ${EXTRA_LIB})
 
 add_executable(generate_turning_radii_benchmarks experiments/generate_turning_radii_benchmarks.cpp)
 target_link_libraries(generate_turning_radii_benchmarks ${EXTRA_LIB})
+
+# Python bindings
+add_subdirectory(src/bindings)

@@ -21,9 +21,9 @@ inline void kinematicCarODE(const oc::ODESolver::StateType& q,
   qdot.resize(q.size(), 0);
 
   // Dynamics
-  qdot[0] = u[0] * cos(heading);
-  qdot[1] = u[0] * sin(heading);
-  qdot[2] = u[0] * tan(u[1]) / global::settings.forwardpropagation.car_length;
+  qdot[0] = u[0] * cos(heading+u[2]);
+  qdot[1] = u[0] * sin(heading+u[2]);
+  qdot[2] = u[0] * (tan(u[1])-tan(u[2])) / global::settings.forwardpropagation.car_length;
   global::settings.ompl.steering_timer.stop();
 }
 
@@ -54,10 +54,10 @@ inline void propagate(const oc::SpaceInformation* si, const ob::State* state,
   si->getStateSpace()->copyState(result, state);
 
   for (int i = 0; i < nsteps; i++) {
-    se2.setX(se2.getX() + dt * u[0] * cos(se2.getYaw()));
-    se2.setY(se2.getY() + dt * u[0] * sin(se2.getYaw()));
+    se2.setX(se2.getX() + dt * u[0] * cos(se2.getYaw()+dt*u[2]));
+    se2.setY(se2.getY() + dt * u[0] * sin(se2.getYaw()+dt*u[2]));
     se2.setYaw(se2.getYaw() +
-               dt * u[0] * tan(dt * u[1]) /
+               dt * u[0] * (tan(dt * u[1])-tan(dt*u[2])) /
                    global::settings.forwardpropagation.car_length);
 
     if (!si->satisfiesBounds(result)) {

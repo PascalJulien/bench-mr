@@ -41,6 +41,7 @@ def ensure_valid_violin(arr):
 
 
 def plot_planner_stats(json_file: str,
+                       custom_stats: dict = None,
                        run_id: str = 'all',
                        plot_violins=True,
                        max_plots_per_line: int = 3,
@@ -154,9 +155,33 @@ def plot_planner_stats(json_file: str,
                                     color=violin_colors[planners.index(
                                         planner) % kwargs['num_colors']],
                                     s=scatter_mark_size)
+                                                                
+            if custom_stats:
+                for planner, metrics in custom_stats.items():
+                    if planner not in stats:
+                        stats[planner] = []
+                    if planner not in valid_planners:
+                        valid_planners.append(planner)
+                    
+                    if stat_key in metrics:
+                        values = metrics[stat_key]
+                        if isinstance(values, list):
+                            # If values is a list of lists, flatten it
+                            if isinstance(values[0], list):
+                                values = values[0]
+                            # Extend instead of append to add individual values
+                            stats[planner].extend([v for v in values if not np.isnan(v)])
+                        elif not np.isnan(values):
+                            stats[planner].append(values)
+            # print(stats)
+            # print(valid_planners)
+
+
             kwargs['run_id'] = run_id
             plt.grid()
             plt.gca().set_axisbelow(True)
+
+
 
             if plot_violins:
                 ticks = np.arange(len(valid_planners)) + 0.5
@@ -203,6 +228,7 @@ def plot_planner_stats(json_file: str,
 
 
 def plot_smoother_stats(json_file: str,
+                        custom_stats:dict = None,
                         run_id: str = 'all',
                         plot_violins=True,
                         max_plots_per_line: int = 2,
@@ -377,6 +403,25 @@ def plot_smoother_stats(json_file: str,
                                             color=violin_colors[bar_names.index(
                                                 bar_name) % kwargs['num_colors']],
                                             s=scatter_mark_size)
+            
+            if custom_stats:
+                for planner, metrics in custom_stats.items():
+                    if planner not in stats:
+                        stats[planner] = []
+                    if planner not in planners:
+                        planners.append(planner)
+                    
+                    if stat_key in metrics:
+                        values = metrics[stat_key]
+                        if isinstance(values, list):
+                            # If values is a list of lists, flatten it
+                            if isinstance(values[0], list):
+                                values = values[0]
+                            # Extend instead of append to add individual values
+                            stats[planner].extend([v for v in values if not np.isnan(v)])
+                        elif not np.isnan(values):
+                            stats[planner].append(values)
+            
             kwargs['run_id'] = run_id
             plt.grid()
             plt.gca().set_axisbelow(True)

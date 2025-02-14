@@ -82,11 +82,11 @@ void PlannerSettings::GlobalSettings::ForwardPropagationSettings::
     global::settings.ompl.state_space = state_space_ptr;
 
     // set the bounds for the control space
-    ob::RealVectorBounds bounds(2);
+    ob::RealVectorBounds bounds(3);
     bounds.setLow(-1.5);
     bounds.setHigh(1.5);
 
-    auto *control_space = new oc::RealVectorControlSpace(state_space_ptr, 2);
+    auto *control_space = new oc::RealVectorControlSpace(state_space_ptr, 3);
     control_space->setBounds(bounds);
     global::settings.ompl.control_space = oc::ControlSpacePtr(control_space);
 
@@ -313,6 +313,22 @@ void PlannerSettings::GlobalSettings::EnvironmentSettings::CollisionSettings::
     robot_shape = SvgPolygonLoader::load(robot_shape_source)[0];
     robot_shape.value().center();
     robot_shape.value().scale(global::settings.env.polygon.scaling);
+
+    // Define the offset
+    double fact = 8.; //factor to adjust the size of the robot relative to the environment
+    double offsetX = fact*((-3.6490/2.)+0.4845); // Place the reference point at the center of the rear axle
+    double offsetY = 0.0; // Place the reference point at the center of the rear axle
+
+    // Apply the offset to each point in the polygon
+    for (auto& point : robot_shape.value().points) {
+
+      point.x = fact*point.x;
+      point.y = fact*point.y;
+
+      point.x += offsetX;
+      point.y += offsetY;
+    }
+
     OMPL_INFORM("Loaded polygon robot model from %s with %d vertices.",
                 robot_shape_source.value().c_str(),
                 robot_shape.value().points.size());

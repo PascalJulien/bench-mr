@@ -189,10 +189,21 @@ class GridMaze : public Environment {
     j["goal"] = {goal().x, goal().y, goalTheta()};
     j["map"] = mapString();
     j["name"] = name();
-    if (global::settings.log_env_distances) j["distances"] = mapDistances();
+    //if (global::settings.log_env_distances) 
+    j["distances"] = mapDistances();
     j["distance_computation_method"] =
         distance_computation::to_string(distanceComputationMethod());
   }
+
+  void setOccupancyGrid(const std::vector<std::vector<bool>>& grid) {
+        if (grid.empty() || grid[0].empty()) return;
+        
+        for (size_t y = 0; y < grid.size() && y < _voxels_y; ++y) {
+            for (size_t x = 0; x < grid[y].size() && x < _voxels_x; ++x) {
+                _grid[coord2key(x, y)] = grid[y][x];
+            }
+        }
+    }
 
  protected:
   using Environment::_collision_timer;

@@ -46,6 +46,7 @@ def visualize(json_file: str,
               run_id: str = 'all',
               show_smoother=False,
               show_only_smoother=False,
+              additional_path = [],
               draw_nodes=True,
               draw_cusps=False,
               cusp_radius: float = 1,
@@ -111,6 +112,11 @@ def visualize(json_file: str,
                 continue
             if planner not in planners:
                 planners.append(planner)
+            if len(additional_path)>0 : 
+                if 'shfm2ws' not in planners:
+                     planners.append('shfm2ws')
+                if 'shfm4ws' not in planners:
+                     planners.append('shfm4ws')
                 
     planners = sorted(planners, key=convert_planner_name)
 
@@ -124,9 +130,10 @@ def visualize(json_file: str,
         for planner in planners:
             if planner.lower() in ignore_planners:
                 continue
-            if planner not in run["plans"]:
+            if planner not in run["plans"] and planner!='shfm2ws' and planner !='shfm4ws':
                 continue
-            plan = run["plans"][planner]
+            if planner!='shfm2ws' and planner !='shfm4ws':
+                plan = run["plans"][planner]
             if not show_only_smoother and convert_planner_name(planner) not in plot_labels:
                 color_ids[planner] = len(plot_labels)
                 plot_labels.append(convert_planner_name(planner))
@@ -138,6 +145,13 @@ def visualize(json_file: str,
                     if plot_label not in plot_labels:
                         color_ids[planner + " " + smoother] = len(plot_labels)
                         plot_labels.append(plot_label)
+        # if len(additional_path)>0 :
+        #     if convert_planner_name('shfm2ws') not in plot_labels :
+        #         color_ids[planner] = len(plot_labels)
+        #         plot_labels.append(convert_planner_name(planner))
+        #     if convert_planner_name('shfm4ws') not in plot_labels :
+        #         color_ids[planner] = len(plot_labels)
+        #         plot_labels.append(convert_planner_name(planner))
     if "num_colors" not in kwargs:
         kwargs["num_colors"] = len(plot_labels)
     colors = get_colors(**kwargs)
@@ -190,6 +204,12 @@ def visualize(json_file: str,
                                 **kwargs)
                 if draw_nodes:
                     plot_nodes(plan["path"], planner, settings, color=colors[color_id], **kwargs)
+                
+        if len(additional_path)>0:
+            plot_trajectory(additional_path[0][i], 'shfm2ws', settings, color=colors[color_ids['shfm2ws']], add_label=False,
+                        **kwargs)
+            plot_trajectory(additional_path[1][i], 'shfm4ws', settings, color=colors[color_ids['shfm4ws']], add_label=False,
+                        **kwargs)
 
             if show_smoother and "smoothing" in plan and plan["smoothing"] is not None:
                 for smoother, smoothing in plan["smoothing"].items():

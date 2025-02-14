@@ -53,14 +53,14 @@ class NormalizedCurvatureMetric : public TMetric<NormalizedCurvatureMetric> {
         if (i >= path.size()) return normalized_k;
         x2 = path[i].x;
         y2 = path[i].y;
-      } while (distance(x1, y1, x2, y2) < 0.3);
+      } while (distance(x1, y1, x2, y2) < 0.1);
 
       do {
         ++i;
         if (i >= path.size()) return normalized_k;
         x3 = path[i].x;
         y3 = path[i].y;
-      } while (distance(x2, y2, x3, y3) < 0.3);
+      } while (distance(x2, y2, x3, y3) < 0.1);
 
       // if two points in a row repeat, we skip curvature computation
       if (x1 == x2 && y1 == y2 || x2 == x3 && y2 == y3) continue;
@@ -72,22 +72,29 @@ class NormalizedCurvatureMetric : public TMetric<NormalizedCurvatureMetric> {
         continue;
       }
 
-      // Compute center of circle that goes through the 3 points
-      double cx =
-          (std::pow(x3, 2.) * (-y1 + y2) + std::pow(x2, 2.) * (y1 - y3) -
-           (std::pow(x1, 2.) + (y1 - y2) * (y1 - y3)) * (y2 - y3)) /
-          (2. * (x3 * (-y1 + y2) + x2 * (y1 - y3) + x1 * (-y2 + y3)));
-      double cy =
-          (-(std::pow(x2, 2.) * x3) + std::pow(x1, 2.) * (-x2 + x3) +
-           x3 * (std::pow(y1, 2.) - std::pow(y2, 2.)) +
-           x1 * (std::pow(x2, 2.) - std::pow(x3, 2.) + std::pow(y2, 2.) -
-                 std::pow(y3, 2.)) +
-           x2 * (std::pow(x3, 2.) - std::pow(y1, 2.) + std::pow(y3, 2.))) /
-          (2. * (x3 * (y1 - y2) + x1 * (y2 - y3) + x2 * (-y1 + y3)));
+      double denominator = 2. * (x3 * (-y1 + y2) + x2 * (y1 - y3) + x1 * (-y2 + y3));
+      if (std::abs(denominator) < 1e-15) {  // Points are nearly collinear
+          continue;  // Skip this set of points
+      }
 
-      // Curvature = 1/Radius
+      // When computing cx and cy, add checks:
+      double cx = (std::pow(x3, 2.) * (-y1 + y2) + std::pow(x2, 2.) * (y1 - y3) -
+                (std::pow(x1, 2.) + (y1 - y2) * (y1 - y3)) * (y2 - y3)) / denominator;
+
+      double cy = (-(std::pow(x2, 2.) * x3) + std::pow(x1, 2.) * (-x2 + x3) +
+                x3 * (std::pow(y1, 2.) - std::pow(y2, 2.)) +
+                x1 * (std::pow(x2, 2.) - std::pow(x3, 2.) + std::pow(y2, 2.) -
+                      std::pow(y3, 2.)) +
+                x2 * (std::pow(x3, 2.) - std::pow(y1, 2.) + std::pow(y3, 2.))) / denominator;
+
+      double ki;
+      // Add checks for valid radius
       double radius = std::sqrt(std::pow(x1 - cx, 2.) + std::pow(y1 - cy, 2.));
-      double ki = 1. / radius;
+      if (radius < 1e-10) {  // Radius too small, indicates sharp turn
+        ki = max_curvature;  // Use maximum allowed curvature instead of infinity
+      } else {
+        ki = 1. / radius;
+      }
 
 #ifdef DEBUG
 #if QT_SUPPORT

@@ -189,9 +189,9 @@
           "cache_cc": "",
           "extended_fmt": "",
           "heuristics": "",
-          "nearest_k": "",
           "num_samples": "",
-          "radius_multiplier": ""
+          "radius_multiplier": "",
+          "use_k_nearest": ""
         },
         "InformedRRTstar": {
           "delay_collision_checking": "",
@@ -344,8 +344,8 @@
       "car_turning_radius": 4.0,
       "hc_cc": {
         "kappa": 0.2,
-        "sigma": 0.2,
-        "resolution": 0.1
+        "resolution": 0.1,
+        "sigma": 0.2
       },
       "posq": {
         "alpha": 3.0,
