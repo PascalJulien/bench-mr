@@ -315,18 +315,19 @@ void PlannerSettings::GlobalSettings::EnvironmentSettings::CollisionSettings::
     robot_shape.value().scale(global::settings.env.polygon.scaling);
 
     // Define the offset
-    double fact = 8.; //factor to adjust the size of the robot relative to the environment
+    double fact = robot_shape.value().max().y/(0.35); //factor to adjust the size of the robot relative to the environment
     double offsetX = fact*((-3.6490/2.)+0.4845); // Place the reference point at the center of the rear axle
     double offsetY = 0.0; // Place the reference point at the center of the rear axle
 
+    std::cout<<"min x : "<<robot_shape.value().min().x<<"  max x : "<<robot_shape.value().max().x<<"\n";
     // Apply the offset to each point in the polygon
     for (auto& point : robot_shape.value().points) {
 
-      point.x = fact*point.x;
-      point.y = fact*point.y;
+      //point.x = fact*point.x;
+      //point.y = fact*point.y;
 
-      point.x += offsetX;
-      point.y += offsetY;
+      point.x -= offsetX;
+      point.y -= offsetY;
     }
 
     OMPL_INFORM("Loaded polygon robot model from %s with %d vertices.",
