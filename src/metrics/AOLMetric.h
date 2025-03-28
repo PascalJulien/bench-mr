@@ -64,7 +64,7 @@ class AOLMetric : public TMetric<AOLMetric> {
         // both in [-pi, pi]
         /* std::cout << yaw_prev << " " << yaw_next << " " << yaw_change << std::endl; */
 
-        total_yaw_change += yaw_change;
+        total_yaw_change += yaw_change; 
 
         prev = current;
         current = next;

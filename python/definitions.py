@@ -11,6 +11,8 @@ stat_names = {
     'planning_time': 'Computation Time',
     'cusps': 'Cusps',
     'aggregate': 'Aggregate',
+    'euclidean_deviation_metrics' : 'Euclidean Deviation Metrics',
+    'angular_deviation_metrics' : 'Angular Deviation Metrics',
 }
 
 metric_properties = {
@@ -136,8 +138,8 @@ planner_names = {
     'fpsst': 'FP SST',
     'fprrt': 'FP RRT',
     'fppdst': 'FP PDST',
-    'shfm2ws' : 'State HFM 2WS',
-    'shfm4ws' : 'State HFM 4WS'
+    'shfm2ws' : 'SHFM 2WS',
+    'shfm4ws' : 'SHFM 4WS'
 }
 
 # Names internally used by MPB/OMPL to appear in the "plans" dictionary of the results files

@@ -168,6 +168,14 @@ std::shared_ptr<GridMaze> GridMaze::createRandomCorridor(
         max_dist = dist;
         environment->setStart(start);
         environment->setGoal(q);
+        if (radius<7)
+        {
+          double move_distance = 7-radius;
+          Point new_q = q;
+          new_q.x = new_q.x - move_distance*std::cos(node(2));
+          new_q.y = new_q.y - move_distance*std::sin(node(2));
+          environment->setGoal(new_q);
+        }
         // flip start yaw angle to be "inwards" the map
         environment->setThetas(PlannerUtils::normalizeAngle(p(2) - M_PI),
                                PlannerUtils::normalizeAngle(node(2)));
@@ -420,9 +428,9 @@ std::vector<Rectangle> GridMaze::obstacles(double x1, double y1, double x2,
 }
 
 void GridMaze::computeDistances() {
-  OMPL_INFORM(("Computing distances via " +
-               distance_computation::to_string(distanceComputationMethod()))
-                  .c_str());
+  //OMPL_INFORM(("Computing distances via " +
+  //             distance_computation::to_string(distanceComputationMethod()))
+  //                .c_str());
   delete[] _distances;
   _distances = new double[(_voxels_x + 1) * (_voxels_y + 1)];
   if (distanceComputationMethod() == distance_computation::DEAD_RECKONING) {

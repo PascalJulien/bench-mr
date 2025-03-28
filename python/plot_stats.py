@@ -99,7 +99,11 @@ def plot_planner_stats(json_file: str,
     planners = sorted(planners, key=convert_planner_name)
     if 'num_colors' not in kwargs:
         kwargs['num_colors'] = len(planners)
+    if custom_stats : 
+        kwargs['num_colors']+=2
     violin_colors = get_colors(**kwargs)
+    violin_colors[-2] = (0,0,1,1)
+    violin_colors[-1] = (1,0,0,1)
     ticks = np.arange(len(planners)) + 0.5
 
     valid_planners = []

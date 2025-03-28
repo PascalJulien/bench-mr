@@ -46,6 +46,10 @@ struct PathStatistics : public Group {
   Property<nlohmann::json> planner_settings{{}, "planner_settings", this};
   Property<std::vector<Point>> cusps{{}, "cusps", this};
   Property<std::vector<Point>> collisions{{}, "collisions", this};
+  Property<double> euclidean_deviation_metrics{
+      std::numeric_limits<double>::quiet_NaN(), "euclidean_deviation_metrics", this};
+  Property<double> angular_deviation_metrics{
+      std::numeric_limits<double>::quiet_NaN(), "angular_deviation_metrics", this};
 
   explicit PathStatistics(const std::string &planner = "UNKNOWN")
       : Group("stats") {

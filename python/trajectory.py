@@ -82,7 +82,6 @@ def visualize(json_file: str,
     import matplotlib as mpl
     mpl.rcParams['mathtext.fontset'] = 'cm'
     mpl.rcParams['pdf.fonttype'] = 42  # make sure to not use Level-3 fonts
-
     ignore_planners = parse_planners(ignore_planners)
     if len(ignore_planners) > 0 and not silence:
         click.echo('Ignoring the following planner(s): %s' % ', '.join(ignore_planners))
@@ -112,11 +111,11 @@ def visualize(json_file: str,
                 continue
             if planner not in planners:
                 planners.append(planner)
-            if len(additional_path)>0 : 
-                if 'shfm2ws' not in planners:
-                     planners.append('shfm2ws')
-                if 'shfm4ws' not in planners:
-                     planners.append('shfm4ws')
+        if len(additional_path)>0 :
+            if 'shfm2ws' not in planners and 'shfm2ws' not in ignore_planners:
+                 planners.append('shfm2ws')
+            if 'shfm4ws' not in planners and 'shfm4ws' not in ignore_planners:
+                 planners.append('shfm4ws')
                 
     planners = sorted(planners, key=convert_planner_name)
 
@@ -155,6 +154,12 @@ def visualize(json_file: str,
     if "num_colors" not in kwargs:
         kwargs["num_colors"] = len(plot_labels)
     colors = get_colors(**kwargs)
+
+    if len(additional_path)>0:
+        if 'shfm2ws' not in ignore_planners:
+            colors[color_ids['shfm2ws']]=(0,0,1,1)
+        if 'shfm4ws' not in ignore_planners:
+            colors[color_ids['shfm4ws']]=(1,0,0,1)
 
     plot_counter = 1
     legend_shown = False
@@ -206,10 +211,12 @@ def visualize(json_file: str,
                     plot_nodes(plan["path"], planner, settings, color=colors[color_id], **kwargs)
                 
         if len(additional_path)>0:
-            plot_trajectory(additional_path[0][i], 'shfm2ws', settings, color=colors[color_ids['shfm2ws']], add_label=False,
-                        **kwargs)
-            plot_trajectory(additional_path[1][i], 'shfm4ws', settings, color=colors[color_ids['shfm4ws']], add_label=False,
-                        **kwargs)
+            if 'shfm2ws' not in ignore_planners:
+                plot_trajectory(additional_path[0][i], 'shfm2ws', settings, color=colors[color_ids['shfm2ws']], add_label=False, # color=colors[color_ids['shfm2ws']]
+                            **kwargs)
+            if 'shfm4ws' not in ignore_planners:
+                plot_trajectory(additional_path[1][i], 'shfm4ws', settings, color=colors[color_ids['shfm4ws']], add_label=False, #color=colors[color_ids['shfm4ws']]
+                            **kwargs)
 
             if show_smoother and "smoothing" in plan and plan["smoothing"] is not None:
                 for smoother, smoothing in plan["smoothing"].items():

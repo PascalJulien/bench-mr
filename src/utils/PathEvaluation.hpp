@@ -1,6 +1,8 @@
 #pragma once
 
 #include <metrics/ClearingMetric.h>
+#include <metrics/EuclideanDeviationMetric.h>
+#include <metrics/AngularDeviationMetric.h>
 #include <metrics/MaxCurvatureMetric.h>
 #include <metrics/NormalizedCurvatureMetric.h>
 #include <metrics/PathLengthMetric.h>
@@ -111,6 +113,8 @@ struct PathEvaluation {
       }
       const auto p = Point::fromPath(solution);
       computeCusps(stats, p);
+      stats.euclidean_deviation_metrics = EuclideanDeviationMetric::evaluate(solution);
+      stats.angular_deviation_metrics = AngularDeviationMetric::evaluate(solution);
     }
     return stats.path_found;
   }
@@ -162,6 +166,9 @@ struct PathEvaluation {
 
       const auto p = Point::fromPath(solution);
       computeCusps(stats, p);
+      stats.euclidean_deviation_metrics = EuclideanDeviationMetric::evaluate(solution);
+      stats.angular_deviation_metrics = AngularDeviationMetric::evaluate(solution);
+
     }
     return stats.path_found;
   }

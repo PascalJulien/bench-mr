@@ -14,6 +14,8 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <fstream>
+#include <metrics/EuclideanDeviationMetric.h>
+#include <metrics/AngularDeviationMetric.h>
 
 
 namespace py = pybind11;
@@ -131,6 +133,64 @@ double compute_aol(const std::vector<std::vector<double>>& path) {
     return AOLMetric::evaluateMetric(geometric_path, 0.0);
 }
 
+// Fonction wrapper pour calculer la distance euclidiennes à l'approche
+double compute_euclidean_deviation(const std::vector<std::vector<double>>& path) {
+    // Créer l'espace d'états SE2
+    auto space(std::make_shared<ob::SE2StateSpace>());
+    
+    // Configurer les limites de l'espace
+    ob::RealVectorBounds bounds(2);
+    bounds.setLow(-1000);
+    bounds.setHigh(1000);
+    space->setBounds(bounds);
+    
+    auto si(std::make_shared<ob::SpaceInformation>(space));
+    si->setup();
+    
+    // Créer le chemin géométrique
+    og::PathGeometric geometric_path(si);
+    
+    // Ajouter les états au chemin
+    for (const auto& p : path) {
+        auto state = si->allocState();
+        state->as<ob::SE2StateSpace::StateType>()->setX(p[0]);
+        state->as<ob::SE2StateSpace::StateType>()->setY(p[1]);
+        state->as<ob::SE2StateSpace::StateType>()->setYaw(p[2]);
+        geometric_path.append(state);
+    }
+    
+    return EuclideanDeviationMetric::evaluateMetric(geometric_path, 0.0);
+}
+
+// Fonction wrapper pour calculer la distance angulaires à l'approche
+double compute_angular_deviation(const std::vector<std::vector<double>>& path) {
+    // Créer l'espace d'états SE2
+    auto space(std::make_shared<ob::SE2StateSpace>());
+    
+    // Configurer les limites de l'espace
+    ob::RealVectorBounds bounds(2);
+    bounds.setLow(-1000);
+    bounds.setHigh(1000);
+    space->setBounds(bounds);
+    
+    auto si(std::make_shared<ob::SpaceInformation>(space));
+    si->setup();
+    
+    // Créer le chemin géométrique
+    og::PathGeometric geometric_path(si);
+    
+    // Ajouter les états au chemin
+    for (const auto& p : path) {
+        auto state = si->allocState();
+        state->as<ob::SE2StateSpace::StateType>()->setX(p[0]);
+        state->as<ob::SE2StateSpace::StateType>()->setY(p[1]);
+        state->as<ob::SE2StateSpace::StateType>()->setYaw(p[2]);
+        geometric_path.append(state);
+    }
+    
+    return AngularDeviationMetric::evaluateMetric(geometric_path, 0.0);
+}
+
 
 
 std::vector<double> compute_clearing_distances(
@@ -217,6 +277,8 @@ PYBIND11_MODULE(metrics_bindings, m) {
     m.def("compute_curvature", &compute_curvature, "Calcule la courbure maximale et normalisée");
     m.def("compute_smoothness", &compute_smoothness, "Calcule la régularité du chemin");
     m.def("compute_aol", &compute_aol, "Calcule la métrique AOL (Angle Over Length)");
+    m.def("compute_angular_deviation", &compute_angular_deviation, "Calcule la deviation angulaires des positions finales");
+    m.def("compute_euclidean_deviation", &compute_euclidean_deviation, "Calcule la distance euclidienne des positions finales");
     m.def("compute_clearing_distances", &compute_clearing_distances, 
           "Compute clearing distances along the path",
           py::arg("path"),
